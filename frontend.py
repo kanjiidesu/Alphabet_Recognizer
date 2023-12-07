@@ -24,6 +24,7 @@ radius = 7
 
 # Set up button variables
 button1_width, button2_width = 100, 100
+# Adjust the starting position of buttons for better centering
 button1_rect = pygame.Rect((width - button1_width) // 4, height + 10, button1_width, button_height)
 button2_rect = pygame.Rect((3 * width - button2_width) // 4, height + 10, button2_width, button_height)
 button_font = pygame.font.Font(None, 36)
@@ -56,7 +57,11 @@ while True:
             elif button2_rect.collidepoint(event.pos):
                 print("Canvas has been cleared")
                 screen.fill(white)
-                # Add your button 2 action here
+                # Draw frame after clearing to keep the border
+                pygame.draw.rect(screen, grey, (0, 0, width, frame_thickness))
+                pygame.draw.rect(screen, grey, (0, height - frame_thickness, width, frame_thickness))
+                pygame.draw.rect(screen, grey, (0, 0, frame_thickness, height))
+                pygame.draw.rect(screen, grey, (width - frame_thickness, 0, frame_thickness, height))
 
             else:
                 drawing = True
