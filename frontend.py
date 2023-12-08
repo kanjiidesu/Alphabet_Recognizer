@@ -61,7 +61,7 @@ while True:
                 # call function to convert drawing to 28x28 png
                 save_image()
                 # convert the RGB values to greyscale
-                # call AI
+                # call AI:
                 # Add your button 1 action here
 
             elif button2_rect.collidepoint(event.pos):
