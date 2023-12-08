@@ -1,5 +1,8 @@
+import imageio
 import pygame
 import sys
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Initialize Pygame
 pygame.init()
@@ -39,6 +42,11 @@ def draw(last_pos, current_pos):
     pygame.draw.line(screen, black, last_pos, current_pos, radius)
 
 
+def save_image():
+    pygame.image.save(screen.subsurface(
+        (frame_thickness, frame_thickness, width - 2 * frame_thickness, height - 2 * frame_thickness)), "drawing.png")
+
+
 # Main loop
 while True:
     for event in pygame.event.get():
@@ -51,6 +59,8 @@ while True:
                 # instead of below clear, print what AI guesses (what letter is it?)
                 print("Button 1 Clicked")
                 # call function to convert drawing to 28x28 png
+                save_image()
+                # convert the RGB values to greyscale
                 # call AI
                 # Add your button 1 action here
 
@@ -88,9 +98,10 @@ while True:
     # Draw text on buttons
     button1_text = button_font.render("Confirm", True, black)
     button2_text = button_font.render("Clear", True, black)
-    screen.blit(button1_text, (button1_rect.centerx - button1_text.get_width() // 2, button1_rect.centery - button1_text.get_height() // 2))
-    screen.blit(button2_text, (button2_rect.centerx - button2_text.get_width() // 2, button2_rect.centery - button2_text.get_height() // 2))
-
+    screen.blit(button1_text, (
+    button1_rect.centerx - button1_text.get_width() // 2, button1_rect.centery - button1_text.get_height() // 2))
+    screen.blit(button2_text, (
+    button2_rect.centerx - button2_text.get_width() // 2, button2_rect.centery - button2_text.get_height() // 2))
 
     # Update display
     pygame.display.flip()
