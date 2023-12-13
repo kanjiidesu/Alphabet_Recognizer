@@ -110,7 +110,7 @@ def train_model(filename: str) -> None:
     model.save(filename)
 
 
-def predict_letter(image: str, model: Model | str = MODEL_FILENAME) -> str:
+def predict_letter(image: str, model: Model | str = MODEL_FILENAME, show_converted_letter: bool = False) -> str:
 
     # (x_train, y_train), (x_test, y_test) = _load_data()
 
@@ -136,7 +136,16 @@ def predict_letter(image: str, model: Model | str = MODEL_FILENAME) -> str:
     # predict digit
     prediction = model.predict(gray)
 
-    return chr(65+prediction.argmax())
+    # Get the predicted letter
+    predicted_letter = chr(65 + prediction.argmax())
+
+    if show_converted_letter:
+        # Display the image with the predicted letter
+        plt.imshow(gray.reshape(img_rows, img_cols), cmap="gray")
+        plt.title(f"Predicted Letter: {predicted_letter}")
+        plt.show()
+
+    return predicted_letter
 
 
 # def confusing_matrix() -> None:
@@ -197,5 +206,5 @@ def letter_from_dataset(letter: str, num_show: int) -> None:
 
 if __name__ == '__main__':
     # train_model(MODEL_FILENAME)
-    letter_from_dataset('Q', 10)
+    letter_from_dataset('F', 1)
     # confusing_matrix()
