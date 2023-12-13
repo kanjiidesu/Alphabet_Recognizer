@@ -13,7 +13,7 @@ width, height = 800, 600
 frame_thickness = 80
 button_height = 50
 screen = pygame.display.set_mode((width, height + button_height))
-pygame.display.set_caption("Simple Draw Program")
+pygame.display.set_caption("AI will guess your letter")
 
 # Set up colors
 black = (0, 0, 0)
@@ -157,7 +157,7 @@ while True:
 
     elif show_popup is False:
         screen = pygame.display.set_mode((width, height + button_height))
-        pygame.display.set_caption("Simple Draw Program")
+        pygame.display.set_caption("AI will guess your letter")
 
         # Set up colors
         black = (0, 0, 0)
