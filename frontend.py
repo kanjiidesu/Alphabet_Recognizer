@@ -69,7 +69,7 @@ while True:
                 # call function to convert drawing to 28x28 png
                 save_image()
                 # convert the RGB values to greyscale
-                # call AI HERE (KEEEEVIN)
+                # TODO Kevin: Convert img to 28x28, then convert RGB to greyscale, Call AI to guess the img (udgangspunkt nummer opgaven)
 
                 # Create the popup
                 pygame.draw.rect(screen, grey, popup_rect)
