@@ -38,12 +38,12 @@ def _load_data() -> tuple:
     x_test: ndarray
     y_test: ndarray
 
-    x_train = np.stack(tuple(~np.array(img.convert('L')) for img in dataset['train']['image']))
+    x_train = np.stack(tuple(np.array(img.convert('L')) for img in dataset['train']['image']))
     y_train = np.array(dataset['train']['label'])
     assert x_train.shape == (len(dataset['train']), img_rows, img_cols)  # (26000, 28, 28)
     assert len(y_train) == len(x_train)
 
-    x_test = np.stack(tuple(~np.array(img.convert('L')) for img in dataset['test']['image']))
+    x_test = np.stack(tuple(np.array(img.convert('L')) for img in dataset['test']['image']))
     y_test = np.array(dataset['test']['label'])
     assert x_test.shape == (len(dataset['test']), img_rows, img_cols)  # (26000, 28, 28)
     assert len(y_test) == len(x_test)
@@ -140,8 +140,8 @@ def predict_letter(image: str, model: Model | str = MODEL_FILENAME, show_convert
     predicted_letter = chr(65 + prediction.argmax())
 
     if show_converted_letter:
-        # Display the image with the predicted letter
-        plt.imshow(gray.reshape(img_rows, img_cols), cmap="gray")
+        # Display the image with the predicted letter, shows image plot
+        plt.imshow(gray.reshape(img_rows, img_cols), cmap='Greys')
         plt.title(f"Predicted Letter: {predicted_letter}")
         plt.show()
 
@@ -206,5 +206,5 @@ def letter_from_dataset(letter: str, num_show: int) -> None:
 
 if __name__ == '__main__':
     # train_model(MODEL_FILENAME)
-    letter_from_dataset('F', 1)
+    letter_from_dataset('B', 1)
     # confusing_matrix()
