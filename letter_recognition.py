@@ -7,7 +7,7 @@ import imageio as imageio
 # import pandas as pd
 # import seaborn as sns
 # from PIL import Image
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 # from keras.datasets import mnist
 # from sklearn.metrics import confusion_matrix
 import numpy as np
@@ -180,6 +180,22 @@ def predict_letter(image: str, model: Model | str = MODEL_FILENAME) -> str:
 #     plt.show()
 
 
+def letter_from_dataset(letter: str, num_show: int) -> None:
+    (x_train, y_train), (x_test, y_test) = _load_data()
+
+    assert len(letter) == 1
+    assert ord(letter) > 64 and ord(letter) < 65+CHARACTER_COUNT
+
+    for img, num in zip(x_train, y_train):
+        if chr(65+num) == letter:
+            plt.imshow(img, cmap='Greys')
+            plt.show()
+            num_show -= 1
+        if num_show <= 0:
+            break
+
+
 if __name__ == '__main__':
-    train_model(MODEL_FILENAME)
+    # train_model(MODEL_FILENAME)
+    letter_from_dataset('Q', 10)
     # confusing_matrix()
