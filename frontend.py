@@ -27,6 +27,9 @@ radius = 7
 
 # Set up button variables
 button1_width, button2_width = 100, 100
+yes_button_rect: pygame.Rect = None
+no_button_rect: pygame.Rect = None
+
 # Adjust the starting position of buttons for better centering
 button1_rect = pygame.Rect((width - button1_width) // 4, height + 10, button1_width, button_height)
 button2_rect = pygame.Rect((3 * width - button2_width) // 4, height + 10, button2_width, button_height)
@@ -34,6 +37,11 @@ button_font = pygame.font.Font(None, 36)
 
 # Set background color
 screen.fill(white)
+
+# Set up popup variables
+popup_width, popup_height = 300, 150
+popup_rect = pygame.Rect((width - popup_width) // 2, (height - popup_height) // 2, popup_width, popup_height)
+popup_font = pygame.font.Font(None, 24)
 
 
 def draw(last_pos, current_pos):
@@ -57,12 +65,37 @@ while True:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if button1_rect.collidepoint(event.pos):
                 # instead of below clear, print what AI guesses (what letter is it?)
-                print("Button 1 Clicked")
+                print("This is what the AI guessed")
                 # call function to convert drawing to 28x28 png
                 save_image()
                 # convert the RGB values to greyscale
-                # call AI:
-                # Add your button 1 action here
+                # call AI HERE (KEEEEVIN)
+
+                # Create the popup
+                pygame.draw.rect(screen, grey, popup_rect)
+                pygame.draw.rect(screen, dark_grey, popup_rect, 5)  # Draw a border around the popup
+
+                # Draw text on the popup
+                popup_text = popup_font.render("Did the AI guess correct?", True, black)
+                screen.blit(popup_text, (popup_rect.centerx - popup_text.get_width() // 2,
+                                         popup_rect.centery - popup_text.get_height() // 2 - 20))
+
+                # Draw two buttons on the popup
+                yes_button_rect = pygame.Rect(popup_rect.centerx - 60, popup_rect.centery + 20, 50, 30)
+                no_button_rect = pygame.Rect(popup_rect.centerx + 10, popup_rect.centery + 20, 50, 30)
+
+                pygame.draw.rect(screen, dark_grey, yes_button_rect)
+                pygame.draw.rect(screen, dark_grey, no_button_rect)
+
+                yes_button_text = popup_font.render("Yes", True, black)
+                no_button_text = popup_font.render("No", True, black)
+
+                screen.blit(yes_button_text,
+                            (yes_button_rect.centerx - yes_button_text.get_width() // 2,
+                             yes_button_rect.centery - yes_button_text.get_height() // 2))
+                screen.blit(no_button_text,
+                            (no_button_rect.centerx - no_button_text.get_width() // 2,
+                             no_button_rect.centery - no_button_text.get_height() // 2))
 
             elif button2_rect.collidepoint(event.pos):
                 print("Canvas has been cleared")
@@ -72,6 +105,16 @@ while True:
                 pygame.draw.rect(screen, grey, (0, height - frame_thickness, width, frame_thickness))
                 pygame.draw.rect(screen, grey, (0, 0, frame_thickness, height))
                 pygame.draw.rect(screen, grey, (width - frame_thickness, 0, frame_thickness, height))
+
+            # Check if "Yes" button is clicked
+            elif yes_button_rect is not None and yes_button_rect.collidepoint(event.pos):
+                print("Yes Button Clicked")
+                pygame.quit()
+
+            # Check if "No" button is clicked
+            elif no_button_rect is not None and no_button_rect.collidepoint(event.pos):
+                print("No Button Clicked")
+                pygame.quit()
 
             else:
                 drawing = True
@@ -99,9 +142,9 @@ while True:
     button1_text = button_font.render("Confirm", True, black)
     button2_text = button_font.render("Clear", True, black)
     screen.blit(button1_text, (
-    button1_rect.centerx - button1_text.get_width() // 2, button1_rect.centery - button1_text.get_height() // 2))
+        button1_rect.centerx - button1_text.get_width() // 2, button1_rect.centery - button1_text.get_height() // 2))
     screen.blit(button2_text, (
-    button2_rect.centerx - button2_text.get_width() // 2, button2_rect.centery - button2_text.get_height() // 2))
+        button2_rect.centerx - button2_text.get_width() // 2, button2_rect.centery - button2_text.get_height() // 2))
 
     # Update display
     pygame.display.flip()
