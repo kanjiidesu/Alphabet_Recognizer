@@ -7,7 +7,7 @@ import imageio as imageio
 # import pandas as pd
 # import seaborn as sns
 # from PIL import Image
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 # from keras.datasets import mnist
 # from sklearn.metrics import confusion_matrix
 import numpy as np
@@ -110,7 +110,7 @@ def train_model(filename: str) -> None:
     model.save(filename)
 
 
-def predict_letter(image: str, model: Model | str = None) -> str:
+def predict_letter(image: str, model: Model | str = MODEL_FILENAME) -> str:
 
     # (x_train, y_train), (x_test, y_test) = _load_data()
 
@@ -130,6 +130,8 @@ def predict_letter(image: str, model: Model | str = None) -> str:
 
     if isinstance(model, str):
         model: Model = load_model(model)
+
+    assert model is not None
 
     # predict digit
     prediction = model.predict(gray)
