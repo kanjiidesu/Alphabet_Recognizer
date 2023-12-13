@@ -3,6 +3,7 @@ import pygame
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
+from letter_recognition import predict_letter
 
 # Initialize Pygame
 pygame.init()
@@ -64,11 +65,12 @@ while True:
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if button1_rect.collidepoint(event.pos):
-                # instead of below clear, print what AI guesses (what letter is it?)
                 print("This is what the AI guessed")
                 # call function to convert drawing to 28x28 png
                 save_image()
+                result = predict_letter("drawing.png")
                 # convert the RGB values to greyscale
+                print(result)
                 # TODO Kevin: Convert img to 28x28, then convert RGB to greyscale, Call AI to guess the img (udgangspunkt nummer opgaven)
 
                 # Create the popup
