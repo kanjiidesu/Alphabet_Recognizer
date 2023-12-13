@@ -136,7 +136,7 @@ def predict_letter(image: str, model: Model | str = MODEL_FILENAME) -> str:
     # predict digit
     prediction = model.predict(gray)
 
-    return prediction.argmax()
+    return chr(65+prediction.argmax())
 
 
 # def confusing_matrix() -> None:
