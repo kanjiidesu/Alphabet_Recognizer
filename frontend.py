@@ -4,6 +4,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from letter_recognition import predict_letter
+import time
 
 # Initialize Pygame
 pygame.init()
@@ -24,7 +25,7 @@ white = (255, 255, 255)
 # Set up drawing variables
 drawing = False
 last_pos = None
-radius = 40
+radius = 15
 
 # Set up button variables
 button1_width, button2_width = 100, 100
@@ -51,13 +52,13 @@ show_popup = None
 def draw(last_pos, current_pos):
     if (last_pos is None):
         return
-    pygame.draw.line(screen, black, last_pos, current_pos, radius)
+    pygame.draw.circle(screen, black, current_pos, radius)
+    # pygame.draw.line(screen, black, last_pos, current_pos, radius)
 
 
-def save_image():
-    # TODO Kevin: Lav mappe, gør så den gemmer drawing_1, drawing_2.... så den ikke overskriver hvergang
+def save_image(filename):
     pygame.image.save(screen.subsurface(
-        (frame_thickness, frame_thickness, width - 2 * frame_thickness, height - 2 * frame_thickness)), "drawing.png")
+        (frame_thickness, frame_thickness, width - 2 * frame_thickness, height - 2 * frame_thickness)), filename)
 
 
 # Main loop
@@ -71,8 +72,9 @@ while True:
             if button1_rect.collidepoint(event.pos):
                 print("This is what the AI guessed: ")
                 # call function to convert drawing to 28x28 png
-                save_image()
-                result = predict_letter("drawing.png", show_converted_letter=True)
+                filename = f"letter-{time.time()}.png"
+                save_image(filename)
+                result = predict_letter(filename, show_converted_letter=True)
                 # convert the RGB values to greyscale
                 print(result)
 
@@ -90,12 +92,12 @@ while True:
 
             # Check if "Yes" button is clicked
             elif yes_button_rect is not None and yes_button_rect.collidepoint(event.pos):
-                print("Yes Button Clicked")
+                print("The ai guessed correct, append answer to dataset")
                 show_popup = False  # Close popup
 
             # Check if "No" button is clicked
             elif no_button_rect is not None and no_button_rect.collidepoint(event.pos):
-                print("No Button Clicked")
+                print("AI guessed wrong, AI will try and guess again.")
                 show_popup = False  # Close popup
 
             else:
