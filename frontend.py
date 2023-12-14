@@ -1,7 +1,14 @@
+import imageio
 import pygame
 import sys
+import matplotlib.pyplot as plt
+import numpy as np
+from numpy import ndarray
+
 from letter_recognition import predict_letter
 import time
+import os
+from os import path
 
 # Initialize Pygame
 pygame.init()
@@ -45,6 +52,8 @@ popup_font = pygame.font.Font(None, 24)
 # Variable to control the visibility of the popup
 show_popup = None
 
+SAVE_DIR: str = 'images_folder'
+
 
 def draw(last_pos, current_pos):
     if (last_pos is None):
@@ -58,6 +67,29 @@ def save_image(filename):
         (frame_thickness, frame_thickness, width - 2 * frame_thickness, height - 2 * frame_thickness)), filename)
 
 
+def ndarray_from_surface() -> ndarray:
+
+    surface = screen.subsurface(
+        (frame_thickness, frame_thickness, width - 2 * frame_thickness, height - 2 * frame_thickness))
+
+    # Resize the Surface to 28x28 pixels
+    resized_surface = pygame.transform.scale(surface, (28, 28))
+
+    # Convert the Pygame Surface to a NumPy array
+    array_3d = pygame.surfarray.array3d(resized_surface)
+
+    # Convert the color image to greyscale
+    grey_array = np.dot(array_3d[..., :3], [0.299, 0.587, 0.114])
+
+    # Normalize the pixel values to the range [0, 1]
+    normalized_grey_array = grey_array / 255.0
+
+    # Optionally, you can reshape the 1D array back to (28, 28)
+    reshaped_array = normalized_grey_array.reshape((28, 28))
+
+    return reshaped_array
+
+
 # Main loop
 while True:
     for event in pygame.event.get():
@@ -68,9 +100,13 @@ while True:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if button1_rect.collidepoint(event.pos):
                 print("This is what the AI guessed: ")
-                # call function to convert drawing to 28x28 png
-                filename = f"letter-{time.time()}.png"
+                try:
+                    os.mkdir(SAVE_DIR)
+                except FileExistsError:
+                    pass
+                filename = path.join(SAVE_DIR, f"letter-{time.time()}.png")
                 save_image(filename)
+                # call function to convert drawing to 28x28 png
                 result = predict_letter(filename, show_converted_letter=True)
                 # convert the RGB values to greyscale
                 print(result)
@@ -154,9 +190,9 @@ while True:
                     (no_button_rect.centerx - no_button_text.get_width() // 2,
                      no_button_rect.centery - no_button_text.get_height() // 2))
 
-# so if the show_popup is false, we will reset the display so that the popup no longer shows on the screen
-# this is not good practice and should be in a function instead
-# clean code was not prioritised.
+    # so if the show_popup is false, we will reset the display so that the popup no longer shows on the screen
+    # this is not good practice and should be in a function instead
+    # clean code was not prioritised.
     elif show_popup is False:
         screen = pygame.display.set_mode((width, height + button_height))
         pygame.display.set_caption("AI will guess your letter")
