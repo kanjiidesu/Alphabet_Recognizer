@@ -84,10 +84,10 @@ def ndarray_from_surface() -> ndarray:
     # Normalize the pixel values to the range [0, 1]
     normalized_grey_array = grey_array / 255.0
 
-    # Optionally, you can reshape the 1D array back to (28, 28)
-    reshaped_array = normalized_grey_array.reshape((28, 28))
+    # Reshape the array to (1, 28, 28, 1)
+    shaped_array = normalized_grey_array.reshape((1, 28, 28, 1))
 
-    return reshaped_array
+    return shaped_array
 
 
 # Main loop
