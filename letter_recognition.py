@@ -110,10 +110,7 @@ def train_model(filename: str) -> None:
     model.save(filename)
 
 
-def predict_letter(image: str, model: Model | str = MODEL_FILENAME, show_converted_letter: bool = False) -> str:
-
-    # (x_train, y_train), (x_test, y_test) = _load_data()
-
+def _imagefile_to_ndarray(image: str):
     im = imageio.imread(image)
 
     # Convert the image to grayscale
@@ -128,20 +125,31 @@ def predict_letter(image: str, model: Model | str = MODEL_FILENAME, show_convert
     # normalize image
     gray = gray / 255
 
+    return gray
+
+
+def predict_letter(image: str | ndarray, model: Model | str = MODEL_FILENAME, show_converted_letter: bool = False) -> str:
+
+    # (x_train, y_train), (x_test, y_test) = _load_data()
+
+    if isinstance(image, str):
+        image = _imagefile_to_ndarray(image)
+    assert isinstance(image, ndarray)
+
     if isinstance(model, str):
         model: Model = load_model(model)
 
     assert model is not None
 
     # predict digit
-    prediction = model.predict(gray)
+    prediction = model.predict(image)
 
     # Get the predicted letter
     predicted_letter = chr(65 + prediction.argmax())
 
     if show_converted_letter:
         # Display the image with the predicted letter, shows image plot
-        plt.imshow(gray.reshape(img_rows, img_cols), cmap='Greys')
+        plt.imshow(image.reshape(img_rows, img_cols), cmap='Greys')
         plt.title(f"Predicted Letter: {predicted_letter}")
         plt.show()
 
