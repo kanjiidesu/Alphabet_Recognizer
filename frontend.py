@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy import ndarray
 
-from letter_recognition import predict_letter
+from letter_recognition import predict_letter, IMG_ROWS, IMG_COLS, format_for_prediction
 import time
 import os
 from os import path
+from PIL import Image
 
 # Initialize Pygame
 pygame.init()
@@ -72,22 +73,16 @@ def ndarray_from_surface() -> ndarray:
     surface = screen.subsurface(
         (frame_thickness, frame_thickness, width - 2 * frame_thickness, height - 2 * frame_thickness))
 
-    # Resize the Surface to 28x28 pixels
-    resized_surface = pygame.transform.scale(surface, (28, 28))
+    # "format_for_prediction()" will resize to 28x28.
 
     # Convert the Pygame Surface to a NumPy array
-    array_3d = pygame.surfarray.array3d(resized_surface)
+    array_3d = pygame.surfarray.array3d(surface)
 
-    # Convert the color image to greyscale
-    grey_array = np.dot(array_3d[..., :3], [0.299, 0.587, 0.114])
+    array_3d = np.rot90(array_3d, k=3)
 
-    # Normalize the pixel values to the range [0, 1]
-    normalized_grey_array = grey_array / 255.0
+    array_3d = np.fliplr(array_3d)
 
-    # Reshape the array to (1, 28, 28, 1)
-    shaped_array = normalized_grey_array.reshape((1, 28, 28, 1))
-
-    return shaped_array
+    return format_for_prediction(array_3d)
 
 
 # Main loop

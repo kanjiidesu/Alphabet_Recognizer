@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from numpy import ndarray
-from datasets import load_dataset
+from datasets import load_dataset, DatasetDict, Dataset, IterableDatasetDict, IterableDataset
 from keras.models import load_model
 from keras import Sequential, Model
 from keras.src.utils import to_categorical
@@ -23,13 +23,17 @@ MODEL_FILENAME: str = "letter_recognizer.h5"
 CHARACTER_COUNT = 26
 mapping = {str(i): chr(i+65) for i in range(CHARACTER_COUNT)}
 
-dataset = load_dataset("pittawat/letter_recognition")
+dataset: DatasetDict | Dataset | IterableDatasetDict | IterableDataset = None
 
 # save input image dimensions
-img_rows, img_cols = 28, 28
+IMG_ROWS, IMG_COLS = 28, 28
 
 
 def _load_data() -> tuple:
+
+    global dataset
+    if dataset is None:
+        dataset = load_dataset("pittawat/letter_recognition")
 
     # Y is true value, X is test
     x_train: ndarray
@@ -39,12 +43,12 @@ def _load_data() -> tuple:
 
     x_train = np.stack(tuple(np.array(img.convert('L')) for img in dataset['train']['image']))
     y_train = np.array(dataset['train']['label'])
-    assert x_train.shape == (len(dataset['train']), img_rows, img_cols)  # (26000, 28, 28)
+    assert x_train.shape == (len(dataset['train']), IMG_ROWS, IMG_COLS)  # (26000, 28, 28)
     assert len(y_train) == len(x_train)
 
     x_test = np.stack(tuple(np.array(img.convert('L')) for img in dataset['test']['image']))
     y_test = np.array(dataset['test']['label'])
-    assert x_test.shape == (len(dataset['test']), img_rows, img_cols)  # (26000, 28, 28)
+    assert x_test.shape == (len(dataset['test']), IMG_ROWS, IMG_COLS)  # (26000, 28, 28)
     assert len(y_test) == len(x_test)
 
     return ((x_train, y_train), (x_test, y_test))
@@ -60,8 +64,8 @@ def train_model(filename: str) -> None:
 
     (x_train, y_train), (x_test, y_test) = _load_data()
 
-    x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
-    x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+    x_train = x_train.reshape(x_train.shape[0], IMG_ROWS, IMG_COLS, 1)
+    x_test = x_test.reshape(x_test.shape[0], IMG_ROWS, IMG_COLS, 1)
 
     x_train = np.float_(x_train)
     x_test = np.float_(x_test)
@@ -78,7 +82,7 @@ def train_model(filename: str) -> None:
     model = Sequential()
     model.add(Conv2D(32, kernel_size=(3, 3),
                      activation='relu',
-                     input_shape=(img_rows, img_cols, 1)))
+                     input_shape=(IMG_ROWS, IMG_COLS, 1)))
 
     model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -109,22 +113,25 @@ def train_model(filename: str) -> None:
     model.save(filename)
 
 
-def _imagefile_to_ndarray(image: str):
-    im = imageio.imread(image)
-
+def format_for_prediction(seq) -> ndarray:
     # Convert the image to grayscale
-    gray = np.dot(im[..., :3], [0.299, 0.587, 0.114])
+    gray = np.dot(seq[..., :3], [0.299, 0.587, 0.114])
 
     # Resize the image to match the training data dimensions
-    gray = np.array(Image.fromarray(gray).resize((img_rows, img_cols)))
+    gray = np.array(Image.fromarray(gray).resize((IMG_ROWS, IMG_COLS)))
 
     # reshape the image
-    gray = gray.reshape(1, img_rows, img_cols, 1)
+    gray = gray.reshape(1, IMG_ROWS, IMG_COLS, 1)
 
     # normalize image
     gray = gray / 255
 
     return gray
+
+
+def _imagefile_to_ndarray(image: str) -> ndarray:
+    im = imageio.imread(image)
+    return format_for_prediction(im)
 
 
 def predict_letter(image: str | ndarray, model: Model | str = MODEL_FILENAME, show_converted_letter: bool = False) -> str:
@@ -148,7 +155,7 @@ def predict_letter(image: str | ndarray, model: Model | str = MODEL_FILENAME, sh
 
     if show_converted_letter:
         # Display the image with the predicted letter, shows image plot
-        plt.imshow(image.reshape(img_rows, img_cols), cmap='Greys')
+        plt.imshow(image.reshape(IMG_ROWS, IMG_COLS), cmap='Greys')
         plt.title(f"Predicted Letter: {predicted_letter}")
         plt.show()
 
