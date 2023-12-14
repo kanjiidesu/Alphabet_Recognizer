@@ -73,11 +73,14 @@ def ndarray_from_surface() -> ndarray:
     surface = screen.subsurface(
         (frame_thickness, frame_thickness, width - 2 * frame_thickness, height - 2 * frame_thickness))
 
-    # Resize the Surface to 28x28 pixels
-    resized_surface = pygame.transform.scale(surface, (28, 28))
+    # "format_for_prediction()" will resize to 28x28.
 
     # Convert the Pygame Surface to a NumPy array
-    array_3d = pygame.surfarray.array3d(resized_surface)
+    array_3d = pygame.surfarray.array3d(surface)
+
+    array_3d = np.rot90(array_3d, k=3)
+
+    array_3d = np.fliplr(array_3d)
 
     return format_for_prediction(array_3d)
 
@@ -99,8 +102,7 @@ while True:
                 filename = path.join(SAVE_DIR, f"letter-{time.time()}.png")
                 save_image(filename)
                 # call function to convert drawing to 28x28 png
-                # result = predict_letter(ndarray_from_surface(), show_converted_letter=True)
-                result = predict_letter(filename, show_converted_letter=True)
+                result = predict_letter(ndarray_from_surface(), show_converted_letter=True)
                 # convert the RGB values to greyscale
                 print(result)
 

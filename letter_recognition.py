@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from numpy import ndarray
-from datasets import load_dataset
+from datasets import load_dataset, DatasetDict, Dataset, IterableDatasetDict, IterableDataset
 from keras.models import load_model
 from keras import Sequential, Model
 from keras.src.utils import to_categorical
@@ -23,13 +23,17 @@ MODEL_FILENAME: str = "letter_recognizer.h5"
 CHARACTER_COUNT = 26
 mapping = {str(i): chr(i+65) for i in range(CHARACTER_COUNT)}
 
-dataset = load_dataset("pittawat/letter_recognition")
+dataset: DatasetDict | Dataset | IterableDatasetDict | IterableDataset = None
 
 # save input image dimensions
 IMG_ROWS, IMG_COLS = 28, 28
 
 
 def _load_data() -> tuple:
+
+    global dataset
+    if dataset is None:
+        dataset = load_dataset("pittawat/letter_recognition")
 
     # Y is true value, X is test
     x_train: ndarray
@@ -123,6 +127,7 @@ def format_for_prediction(seq) -> ndarray:
     gray = gray / 255
 
     return gray
+
 
 def _imagefile_to_ndarray(image: str) -> ndarray:
     im = imageio.imread(image)
