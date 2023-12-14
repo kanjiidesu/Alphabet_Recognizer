@@ -190,6 +190,9 @@ while True:
                     (no_button_rect.centerx - no_button_text.get_width() // 2,
                      no_button_rect.centery - no_button_text.get_height() // 2))
 
+    # so if the show_popup is false, we will reset the display so that the popup no longer shows on the screen
+    # this is not good practice and should be in a function instead
+    # clean code was not prioritised.
     elif show_popup is False:
         screen = pygame.display.set_mode((width, height + button_height))
         pygame.display.set_caption("AI will guess your letter")
@@ -203,7 +206,7 @@ while True:
         # Set up drawing variables
         drawing = False
         last_pos = None
-        radius = 40
+        radius = 15
 
         # Set up button variables
         button1_width, button2_width = 100, 100

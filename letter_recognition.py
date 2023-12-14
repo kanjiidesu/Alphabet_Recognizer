@@ -18,7 +18,6 @@ from keras.models import load_model
 from keras import Sequential, Model
 from keras.src.utils import to_categorical
 from keras.src.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
-# from sklearn.metrics import confusion_matrix
 
 MODEL_FILENAME: str = "letter_recognizer.h5"
 CHARACTER_COUNT = 26
@@ -186,6 +185,7 @@ def predict_letter(image: str | ndarray, model: Model | str = MODEL_FILENAME, sh
 #
 #     # Create confusion matrix
 #     # TODO Kevin: Maybe fix plz IDK
+#     # TODO Kevin: DELETE if not used
 #     cm = confusion_matrix(y_true_labels, y_pred_labels)
 #
 #     # Plot confusion matrix
