@@ -107,7 +107,7 @@ while True:
                 filename = path.join(SAVE_DIR, f"letter-{time.time()}.png")
                 save_image(filename)
                 # call function to convert drawing to 28x28 png
-                result = predict_letter(filename, show_converted_letter=True)
+                result = predict_letter(ndarray_from_surface(), show_converted_letter=True)
                 # convert the RGB values to greyscale
                 print(result)
 
