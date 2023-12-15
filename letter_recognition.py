@@ -1,7 +1,10 @@
+#!env/bin/python3
 """ Copied from assignment, modified by Kevin, with support and fixes from Jonas. """
 
 from __future__ import annotations
 
+import os
+from os import path
 import imageio as imageio
 # import os
 # import pandas as pd
@@ -28,14 +31,16 @@ dataset: DatasetDict | Dataset | IterableDatasetDict | IterableDataset = None
 # save input image dimensions
 IMG_ROWS, IMG_COLS = 28, 28
 
+SAVE_DIR: str = 'images_folder'
 
-def _load_data() -> tuple:
+
+def _load_data(with_user_images=True) -> tuple:
 
     global dataset
     if dataset is None:
         dataset = load_dataset("pittawat/letter_recognition")
 
-    # Y is true value, X is test
+    # Y is true value, X is the image
     x_train: ndarray
     y_train: ndarray
     x_test: ndarray
@@ -50,6 +55,56 @@ def _load_data() -> tuple:
     y_test = np.array(dataset['test']['label'])
     assert x_test.shape == (len(dataset['test']), IMG_ROWS, IMG_COLS)  # (26000, 28, 28)
     assert len(y_test) == len(x_test)
+
+    if with_user_images:
+        sorted_files = sorted(os.listdir(SAVE_DIR))
+
+        # Set the ratio for train/test split
+        split_ratio = 0.8
+
+        # Determine the split index
+        split_index = int(len(sorted_files) * split_ratio)
+
+        # Split files into training and test sets
+        train_files = sorted_files[:split_index]
+        test_files = sorted_files[split_index:]
+
+        # Y is true value, X is the image
+        x_train2 = []
+        y_train2 = []
+        x_test2 = []
+        y_test2 = []
+
+        # Iterate through training files
+        for file_name in train_files:
+            image_path = os.path.join(SAVE_DIR, file_name)
+            # Extract the letter from the filename (assuming it's the first character)
+            letter = file_name.split('-')[0]
+            #letter = path.split(file_name)[-1].split('-')[0]
+            # Read and preprocess the image
+            image = np.array(Image.open(image_path).resize((28, 28)).convert('L')) / 255.0
+            # Append to arrays
+            x_train2.append(image)
+            y_train2.append(ord(letter) - ord('A'))  # Assuming letters are uppercase A-Z
+
+        # Iterate through test files
+        for file_name in test_files:
+            image_path = os.path.join(SAVE_DIR, file_name)
+            # Extract the letter from the filename (assuming it's the first character)
+            letter = file_name.split('-')[0]
+            #letter = path.split(file_name)[-1].split('-')[0]
+            # Read and preprocess the image
+            image = np.array(Image.open(image_path).resize((28, 28)).convert('L')) / 255.0
+            # Append to arrays
+            x_test2.append(image)
+            y_test2.append(ord(letter) - ord('A'))  # Assuming letters are uppercase A-Z
+
+        x_train = np.concatenate((np.array(x_train2), x_train))
+        y_train = np.concatenate((np.array(y_train2), y_train))
+        x_test = np.concatenate((np.array(x_test2), x_test))
+        y_test = np.concatenate((np.array(y_test2), y_test))
+
+    # user_images = {letter: _imagefile_to_ndarray(imagefile) }
 
     return ((x_train, y_train), (x_test, y_test))
 
@@ -120,8 +175,9 @@ def format_for_prediction(seq) -> ndarray:
     # Resize the image to match the training data dimensions
     gray = np.array(Image.fromarray(gray).resize((IMG_ROWS, IMG_COLS)))
 
-    # reshape the image
-    gray = gray.reshape(1, IMG_ROWS, IMG_COLS, 1)
+    if gray.shape != (1, IMG_ROWS, IMG_COLS, 1):
+        # reshape the image
+        gray = gray.reshape(1, IMG_ROWS, IMG_COLS, 1)
 
     # normalize image
     gray = gray / 255
@@ -192,7 +248,6 @@ def predict_letter(image: str | ndarray, model: Model | str = MODEL_FILENAME, sh
 #
 #     # Create confusion matrix
 #     # TODO Kevin: Maybe fix plz IDK
-#     # TODO Kevin: DELETE if not used
 #     cm = confusion_matrix(y_true_labels, y_pred_labels)
 #
 #     # Plot confusion matrix
