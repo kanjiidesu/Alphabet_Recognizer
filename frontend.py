@@ -1,3 +1,5 @@
+#!env/bin/python3
+
 import imageio
 import pygame
 import sys
@@ -5,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy import ndarray
 
-from letter_recognition import predict_letter, IMG_ROWS, IMG_COLS, format_for_prediction
+from letter_recognition import predict_letter, IMG_ROWS, IMG_COLS, format_for_prediction, SAVE_DIR
 import time
 import os
 from os import path
@@ -53,7 +55,7 @@ popup_font = pygame.font.Font(None, 24)
 # Variable to control the visibility of the popup
 show_popup = None
 
-SAVE_DIR: str = 'images_folder'
+result: str = None
 
 
 def draw(last_pos, current_pos):
@@ -95,15 +97,7 @@ while True:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if button1_rect.collidepoint(event.pos):
                 print("This is what the AI guessed: ")
-                try:
-                    os.mkdir(SAVE_DIR)
-                except FileExistsError:
-                    pass
-                filename = path.join(SAVE_DIR, f"letter-{time.time()}.png")
-                save_image(filename)
-                # call function to convert drawing to 28x28 png
                 result = predict_letter(ndarray_from_surface(), show_converted_letter=True)
-                # convert the RGB values to greyscale
                 print(result)
 
                 # Show the popup
@@ -122,6 +116,18 @@ while True:
             elif yes_button_rect is not None and yes_button_rect.collidepoint(event.pos):
                 print("The ai guessed correct, append answer to dataset")
                 show_popup = False  # Close popup
+                # TODO Karina: Implement hide_popup function.
+                try:
+                    os.mkdir(SAVE_DIR)
+                except FileExistsError:
+                    pass
+                filename = path.join(SAVE_DIR, f"{result}-{int(time.time())}.png")
+                # bitmap: ndarray = ndarray_from_surface()
+                # pygame.quit()
+                # bitmap = bitmap.reshape(IMG_ROWS, IMG_COLS)  # (28, 28)
+                # bitmap = (bitmap * 255).astype(np.uint8)
+                # Image.fromarray(bitmap, mode='L').save(filename)
+                save_image(filename)
 
             # Check if "No" button is clicked
             elif no_button_rect is not None and no_button_rect.collidepoint(event.pos):
